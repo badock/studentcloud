@@ -4,6 +4,7 @@ class Snippet {
 
 	String code
 	String trace
+	String console
 
 	boolean isRunning = false
 
@@ -14,6 +15,8 @@ class Snippet {
 
 	static mapping = {
 		code type: 'text'
+		trace type: 'text'
+		console type: 'text'
 	}
 
 	String getTestCode() {
@@ -49,14 +52,15 @@ import java.io.PrintStream;
 
 public class Test"""+id+""" {
 
-		public static PrintStream out;
+		public static PrintStream testOut;
+		public static PrintStream sysout;
 
 		public void check(boolean b, String okMessage, String koMessage) {
 			if(b) {
-				out.println("[SUCCESS]"+okMessage);
+				testOut.println("[SUCCESS]"+okMessage);
 			}
 			else {
-				out.println("[FAILURE]"+koMessage);
+				testOut.println("[FAILURE]"+koMessage);
 			}
 		}
 
@@ -64,11 +68,14 @@ public class Test"""+id+""" {
 	
 	"""+junitString+"""
 
-	public static void run(PrintStream out) {
-		Test"""+id+""".out = out;
+	public static void run(PrintStream testOut, PrintStream sysout) {
+		Test"""+id+""".testOut = testOut;
+		Test"""+id+""".sysout = sysout;
 
 		Test"""+id+""" test = new Test"""+id+"""();
 		"""+junitStringCall+"""
+		Test"""+id+""".testOut.close();
+		Test"""+id+""".sysout.close();
 	}
 		 
 }

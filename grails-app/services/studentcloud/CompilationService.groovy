@@ -23,6 +23,7 @@ import java.net.URLClassLoader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
+import groovy.transform.*;
 
 class CompilationService {
 
@@ -61,12 +62,20 @@ class CompilationService {
 			return contents;
 		}
 	}
-
-	def addLineToSnippetConsole(snippet, line) {
+	
+	class QuickLock {
+		
+		@WithWriteLock
+		public void waitForLock(){
+			
+		}
+	}
+	
+	def addLineToSnippetConsole(snippet, traceline, consoleline) {
 		if(snippet != null) {			
-			snippet.trace += line +"<br/>"
+			snippet.trace = traceline		
+			snippet.console = consoleline
 			snippet.save(flush:true)
-			sleep 10
 		}
 	}
 
@@ -130,7 +139,7 @@ class CompilationService {
 			Class thisClass = loader.loadClass("toto.Test"+snippet.id);
 			Object iClass = thisClass.newInstance();
 
-			Method thisMethod = thisClass.getDeclaredMethod("run", PrintStream.class);
+			Method thisMethod = thisClass.getDeclaredMethod("run", PrintStream.class, PrintStream.class);
 
 			URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader();
 			classLoader.addURL(new File("lib/junit-4.10.jar").toURL());
@@ -139,34 +148,92 @@ class CompilationService {
 
 			PipedInputStream inp = new PipedInputStream();
 			PipedOutputStream outp = new PipedOutputStream(inp);
-
-
 			BufferedReader buffin = new BufferedReader(new InputStreamReader(inp));
+			
+			PipedInputStream sysinp = new PipedInputStream();
+			PipedOutputStream sysoutp = new PipedOutputStream(sysinp);
+			BufferedReader buffSysIn = new BufferedReader(new InputStreamReader(sysinp));
+
+			
 
 			snippet.trace = ""
+			snippet.console = ""
 			snippet.isRunning = true
 			snippet.save(flush:true)
 
-			def th = Thread.start {
+			int finished = 0
+			
+			def sysLock = new QuickLock()
+			def testLock = new QuickLock()
+			
+			String testOutComplete = ""
+			String consoleOutComplete = ""
+			String testOutChanges = ""
+			String consoleOutChanges = ""
+			
+			
+			
+			def thtest = Thread.start {
 				String line = null;
+				
 				while((line = buffin.readLine()) != null) {
-					Snippet.withTransaction {
-						addLineToSnippetConsole(snippet, line)						
+					testOutChanges += line+"<br/>"
+					testOutComplete += line+"<br/>"
+					
+					sleep(30)
+				}
+				
+				finished++	
+				buffin.close()
+				//println("STOP TEST")
+			}
+			
+			def thsys = Thread.start {
+				String line = null;
+				
+				while((line = buffSysIn.readLine()) != null) {
+					consoleOutChanges += line+"<br/>"
+					consoleOutComplete += line+"<br/>"
+					
+					sleep(30)
+				}				
+				
+				finished++				
+				buffSysIn.close()
+				
+				//println("STOP SYS")
+			}
+			
+			def thSnippetUpdator = Thread.start {
+				
+				while(finished<2 || testOutChanges != "" || consoleOutChanges != "" && !executionFinished) {
+					sleep(50)
+					if(testOutChanges != "" || consoleOutChanges != "") {
+												
+						Snippet.withTransaction {
+							addLineToSnippetConsole(snippet, testOutComplete, consoleOutComplete)
+						}
+						
+						testOutChanges = ""
+						consoleOutChanges = ""
+						
+						sleep(100)
 					}
 				}
-
+				
+				//println("STOP ENVOI")
 				
 				Snippet.withTransaction {
 					snippet.isRunning = false
 					snippet.save(flush:true)
 				}
-				buffin.close()
 			}
-
-			thisMethod.invoke(null, new PrintStream(outp));
-
-			executionFinished = true
-			snippet.save(flush:true)
+			
+			
+			def thExecution = Thread.start {				
+				thisMethod.invoke(null, new PrintStream(outp), new PrintStream(sysoutp));
+				executionFinished = true
+			}
 			
 			System.out.println("Execution OK!")
 		}

@@ -5,14 +5,15 @@ import java.io.PrintStream;
 
 public class Test1 {
 
-		public static PrintStream out;
+		public static PrintStream testOut;
+		public static PrintStream sysout;
 
 		public void check(boolean b, String okMessage, String koMessage) {
 			if(b) {
-				out.println("[SUCCESS]"+okMessage);
+				testOut.println("[SUCCESS]"+okMessage);
 			}
 			else {
-				out.println("[FAILURE]"+koMessage);
+				testOut.println("[FAILURE]"+koMessage);
 			}
 		}
 
@@ -21,6 +22,10 @@ public class Test1 {
   
   public void incremente() {
   	nombre += 1;
+    
+    for(int i=0;i<200;i++) {
+    	sysout.println("cpt"+i);
+    }
   }
   
   public int getNombre() {
@@ -38,13 +43,16 @@ check(a.getNombre()==1,"new A().inc() doit est egal à 1","new A().inc() n'est p
     }
 
 
-	public static void run(PrintStream out) {
-		Test1.out = out;
+	public static void run(PrintStream testOut, PrintStream sysout) {
+		Test1.testOut = testOut;
+		Test1.sysout = sysout;
 
 		Test1 test = new Test1();
 		
 	test.test0();
 
+		Test1.testOut.close();
+		Test1.sysout.close();
 	}
 		 
 }

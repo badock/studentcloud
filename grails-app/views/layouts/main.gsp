@@ -63,9 +63,6 @@
       </div>
     </div>
 	
-	<br/>
-	<br/>
-	
     <div class="container-fluid">
       <div class="row-fluid">                 
           <g:layoutBody/>

@@ -8,7 +8,7 @@ class Exercice {
 	static hasMany = [tests:UnitTest]
 	
 	def createSnippetWithTenant(tenant) {
-		new Snippet(code:code, trace:"", exercice:this).save(flush:true)
+		new Snippet(code:code, trace:"", console:"", exercice:this).save(flush:true)
 	}
 	
     static constraints = {

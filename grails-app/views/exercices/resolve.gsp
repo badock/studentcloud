@@ -19,19 +19,32 @@
   <body>
     <h1>${exercice.question }</h1>
 	<b>snippet: #${snippet.id }</b>
-    <g:form controller="exercices" action="save">
-    	<g:hiddenField name="id" value="${snippet.id }"/>
-    	<textarea id="code" name="code">${snippet.code }</textarea>
-    	<g:submitButton name="Save"/>
-    </g:form>
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span8">
+				<g:form controller="exercices" action="save">
+					<g:hiddenField name="id" value="${snippet.id }" />
+					<textarea id="code" name="code">${snippet.code }</textarea>
+					<g:submitButton name="Save" />
+				</g:form>
+
+<%--				<g:submitButton id="refresh_console_btn" name="Refresh Console" />--%>
+
+				<g:form controller="exercices" action="run">
+					<g:hiddenField name="id" value="${snippet.id }" />
+					<g:submitButton name="Run this code" />
+				</g:form>
+			</div>
+			<div class="span4">		
+				<div id="test_report"></div>
+			</div>
+		</div>
+	</div>
+
+
 	
-	<g:submitButton id="refresh_console_btn" name="Refresh Console"/>
-	
-	<g:form controller="exercices" action="run">
-    	<g:hiddenField name="id" value="${snippet.id }"/>
-    	<g:submitButton name="Run this code"/>
-    </g:form>
-	
+	Console:
 	<div id="console"></div>
 	
     <script>
@@ -48,17 +61,18 @@
 
     	function refresh_console() {
 	  		jQuery.ajax({
-   	    	  url: "../snippet/1",
+   	    	  url: "http://localhost:8080/studentcloud/snippet/1",
    	    	  context: document.body
    	    	}).done(function( msg ) {
    	   	    	
    	    		//alert( "Data Saved: " + msg );
    	    		//alert(msg.trace)
-				$("#console").html(msg.trace);
+				$("#test_report").html(msg.trace);
+				$("#console").html(msg.console);
    	    		if(msg.isRunning) {
 	   	   	   	    setTimeout(function(){
 	   	    			refresh_console();
-	   	    		},500);
+	   	    		},200);
    	    		}
    	    		
    	    	});
