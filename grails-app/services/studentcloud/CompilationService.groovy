@@ -90,7 +90,8 @@ class CompilationService {
 		File sourceFile   = new File("tmp/toto/Test"+snippet.id+".java");
 		FileWriter writer = new FileWriter(sourceFile);
 
-		writer.write(snippet.getTestCode());
+		// redirect "manually" System.out to the sysout output stream
+		writer.write(snippet.getTestCode().replaceAll("System.out", "sysout"));
 		writer.close();
 
 		// for compilation diagnostic message processing on compilation WARNING/ERROR

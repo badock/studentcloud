@@ -21,7 +21,9 @@ public class Test1 {
   private int nombre = 0;
   
   public void incremente() {
-  	nombre += 1;
+  	// à implémenter!
+    nombre += 1;
+    sysout.println("message visible dans la console!");
   }
   
   public int getNombre() {

@@ -11,7 +11,8 @@
     <script type="text/javascript" src="${resource(dir: 'js', file: 'codemirror.js')}"></script>
     <script type="text/javascript" src="${resource(dir: 'js', file: 'simple-hint.js')}"></script>
     <script type="text/javascript" src="${resource(dir: 'js', file: 'javascript-hint.js')}"></script>
-    <script type="text/javascript" src="${resource(dir: 'js', file: 'javascript.js')}"></script>
+<%--    <script type="text/javascript" src="${resource(dir: 'js', file: 'javascript.js')}"></script>--%>
+    <script type="text/javascript" src="${resource(dir: 'js', file: 'clike.js')}"></script>
     <script type="text/javascript" src="${resource(dir: 'js', file: 'jquery.js')}"></script>
     
     <style type="text/css">
@@ -75,10 +76,16 @@
       CodeMirror.commands.autocomplete = function(cm) {
         CodeMirror.simpleHint(cm, CodeMirror.javascriptHint);
       }
+<%--      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {--%>
+<%--        lineNumbers: true,--%>
+<%--        extraKeys: {"Ctrl-Space": "autocomplete"}--%>
+<%--      });--%>
       var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: true,
-        extraKeys: {"Ctrl-Space": "autocomplete"}
-      });
+          lineNumbers: true,
+          matchBrackets: true,
+          extraKeys: {"Ctrl-Space": "autocomplete"},
+          mode: "text/x-java"
+        });
     </script>
     
     <script>
