@@ -19,7 +19,7 @@ class BootStrap {
 }""").save(flush:true)
 				def test1 = new UnitTest(code:"""A a = new A();
 a.incremente();
-check(a.getNombre()==1,"new A().inc() doit est egal à 1","new A().inc() n'est pas egal à 1");
+check(a.getNombre()==1,"new A().inc() est egal à 1","new A().inc() n'est pas egal à 1");
 """, exercice:exercice1).save(flush:true);
 			}
 		}

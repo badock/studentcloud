@@ -22,10 +22,6 @@ public class Test1 {
   
   public void incremente() {
   	nombre += 1;
-    
-    for(int i=0;i<200;i++) {
-    	sysout.println("cpt"+i);
-    }
   }
   
   public int getNombre() {
@@ -38,7 +34,7 @@ public class Test1 {
 	public void test0() {
 		A a = new A();
 a.incremente();
-check(a.getNombre()==1,"new A().inc() doit est egal à 1","new A().inc() n'est pas egal à 1");
+check(a.getNombre()==1,"new A().inc() est egal à 1","new A().inc() n'est pas egal à 1");
 
     }
 
