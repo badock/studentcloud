@@ -1,0 +1,36 @@
+
+package toto;
+
+import org.junit.*;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+
+public class TestA {
+
+	class A {
+		private int nombre = 0;
+
+		public void incremente() {
+			// à implémenter!
+		}
+
+		public int getNombre() {
+			return nombre;
+		}
+	}
+
+
+	@org.junit.Test
+	public void test0() {
+		A a = new A();
+		a.incremente();
+		assert(a.getNombre()==1);
+
+	}
+
+
+	public static void main(String[] args) {
+		System.out.println("bouh!");
+	}
+
+}

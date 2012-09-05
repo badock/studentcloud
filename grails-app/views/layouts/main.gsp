@@ -48,13 +48,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <g:link class="brand" controller="store" action="index">Cloud java exercices</g:link>
+          <g:link class="brand" controller="exercices" action="index">Student cloud</g:link>
           <div class="nav-collapse">
             <ul class="nav">
             
             
               <li><g:link controller="exercices" action="index">Exercices</g:link></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><g:link controller="administration" action="index">Administration</g:link></li>
             </ul>
             <p class="navbar-text pull-right">
             </p>

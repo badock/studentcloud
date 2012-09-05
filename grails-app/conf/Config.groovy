@@ -60,13 +60,17 @@ grails.exceptionresolver.params.exclude = ['password']
 grails.hibernate.cache.queries = false
 
 environments {
-    development {
-        grails.logging.jul.usebridge = true
-    }
-    production {
-        grails.logging.jul.usebridge = false
-        // TODO: grails.serverURL = "http://www.changeme.com"
-    }
+	development {
+		grails.logging.jul.usebridge = true
+		grails.serverURL = "http://localhost:8080"
+		grails.domainURL = "localhost:8080"
+	}
+	production {
+		grails.logging.jul.usebridge = false
+		grails.serverURL = "http://shoppycloud.com:8080"
+		grails.domainURL = "shoppycloud.com:8080"
+		// TODO: grails.serverURL = "http://www.changeme.com"
+	}
 }
 
 // log4j configuration

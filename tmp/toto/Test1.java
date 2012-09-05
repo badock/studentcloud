@@ -1,0 +1,50 @@
+
+package toto;
+
+import java.io.PrintStream;
+
+public class Test1 {
+
+		public static PrintStream out;
+
+		public void check(boolean b, String okMessage, String koMessage) {
+			if(b) {
+				out.println("[SUCCESS]"+okMessage);
+			}
+			else {
+				out.println("[FAILURE]"+koMessage);
+			}
+		}
+
+			class A {
+  private int nombre = 0;
+  
+  public void incremente() {
+  	nombre += 1;
+  }
+  
+  public int getNombre() {
+  	return nombre;
+  }
+}
+	
+	
+
+	public void test0() {
+		A a = new A();
+a.incremente();
+check(a.getNombre()==1,"new A().inc() doit est egal à 1","new A().inc() n'est pas egal à 1");
+
+    }
+
+
+	public static void run(PrintStream out) {
+		Test1.out = out;
+
+		Test1 test = new Test1();
+		
+	test.test0();
+
+	}
+		 
+}

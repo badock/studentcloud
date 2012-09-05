@@ -1,5 +1,7 @@
 <%=packageName ? "package ${packageName}\n\n" : ''%>import org.springframework.dao.DataIntegrityViolationException
 
+import grails.converters.JSON;
+
 class ${className}Controller {
 	
 	def grailsApplication
@@ -20,8 +22,11 @@ class ${className}Controller {
 	}
 	
 	def toUrlWithTenant(blob) {
-		def url_server = grailsApplication.config.grails.domainURL
-		String result = "http://"+request.serverName.substring(0, request.serverName.indexOf("."))+"."+url_server+"/${className}"+"/"
+		def url_server = grailsApplication.config.grails.domainURL+"/studentcloud"
+		
+		//String result = "http://"+request.serverName.substring(0, request.serverName.indexOf("."))+"."+url_server+"/${className}"+"/"
+		String result = "http://"+url_server+"/${className}"+"/"
+		
 		if(blob.action)
 			result += blob.action
 		if(blob.id)
@@ -72,6 +77,19 @@ class ${className}Controller {
         [${propertyName}: ${propertyName}]
     }
 
+	def showjson() {
+		def ${propertyName} = ${className}.get(params.id)
+		if (!${propertyName}) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])
+			//redirect(action: "list")
+			redirectToUrlWithTenant([action : "list"])
+			return
+		}
+
+		
+		render ${propertyName} as JSON
+	}
+	
     def edit() {
         def ${propertyName} = ${className}.get(params.id)
         if (!${propertyName}) {

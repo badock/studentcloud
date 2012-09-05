@@ -1,10 +1,7 @@
 package studentcloud
 
-class ExerciceController {
 
-	def exercices() {
-		render(view:"exercices")	
-	}
+class ExerciceController {
 	
 	static scaffold = true
 }

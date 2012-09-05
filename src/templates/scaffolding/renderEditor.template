@@ -1,6 +1,8 @@
 <%  
 	if (property.name.startsWith("markdown"))
         out << renderMarkdownStringEditor(domainClass, property)
+    if (property.name.startsWith("code"))
+        out << renderSourceCodeEditor(domainClass, property)
 	else if (property.type == Boolean || property.type == boolean)
         out << renderBooleanEditor(domainClass, property)
     else if (property.type && Number.isAssignableFrom(property.type) || (property.type?.isPrimitive() && property.type != boolean))
@@ -82,6 +84,38 @@
 			}
 			sb as String
         }
+    }
+
+	private renderSourceCodeEditor(domainClass, property) {
+		def sb = new StringBuilder("")
+		sb << '''
+		    <link rel="stylesheet" href="${resource(dir: 'css', file: 'simple-hint.css')}" type="text/css">
+    <link rel="stylesheet" href="${resource(dir: 'css', file: 'codemirror.css')}" type="text/css">
+    
+    <script type="text/javascript" src="${resource(dir: 'js', file: 'codemirror.js')}"></script>
+    <script type="text/javascript" src="${resource(dir: 'js', file: 'simple-hint.js')}"></script>
+    <script type="text/javascript" src="${resource(dir: 'js', file: 'javascript-hint.js')}"></script>
+    <script type="text/javascript" src="${resource(dir: 'js', file: 'javascript.js')}"></script>
+    <script type="text/javascript" src="${resource(dir: 'js', file: 'jquery.js')}"></script>
+    
+    <style type="text/css">.CodeMirror {border: 1px solid #eee;} .CodeMirror-scroll { height: 100% }</style>
+		'''
+		sb << '<div class="fieldcontain ${hasErrors(bean: productInstance, field: \'markdownDescription\', \'error\')} ">'		
+
+		sb << '		<textarea id="code" name="' << property.name << '">${' << "${domainInstance}?.${property.name}" << '}</textarea>'
+		sb << '''<script>
+      CodeMirror.commands.autocomplete = function(cm) {
+        CodeMirror.simpleHint(cm, CodeMirror.javascriptHint);
+      }
+      var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        extraKeys: {"Ctrl-Space": "autocomplete"}
+      });
+    </script>'''
+		sb << '</div>'
+			
+           
+			sb as String
     }
 
 	private renderMarkdownStringEditor(domainClass, property) {

@@ -7,6 +7,10 @@ class UrlMappings {
 			}
 		}
 
+		"/snippet/$id"(controller: "snippet", parseRequest: true) {
+		    action = [GET: "showjson"]
+		}
+		
 		"/"(view:"/index")
 		"500"(view:'/error')
 	}
