@@ -68,7 +68,6 @@
 			<div class="navbar-inner">
 				<ul class="nav">
 					<li><g:link controller="exercice" action="list">Exercices</g:link></li>
-					<li><g:link controller="unitTest" action="list">Unit Tests</g:link></li>
 				</ul>
 			</div>
 		</div>

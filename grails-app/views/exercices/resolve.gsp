@@ -120,7 +120,7 @@
     
     	function refresh_console() {
 	  		jQuery.ajax({
-   	    	  url: "http://localhost:8080/studentcloud/snippet/1",
+   	    	  url: "http://localhost:8080/studentcloud/snippet/${snippet.id }",
    	    	  context: document.body
    	    	}).done(function( msg ) {
    	   	    	

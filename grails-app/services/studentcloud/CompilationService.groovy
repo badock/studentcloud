@@ -29,6 +29,72 @@ class CompilationService {
 
 	private static String classOutputFolder = "/classes/demo";
 
+
+	public static String getTestCode(snippet) {
+
+		String junitString = ""
+		int cpt = 0
+		if(snippet.exercice != null) {
+
+			for(test in snippet.exercice.tests) {
+				junitString += """
+
+	public void test"""+cpt+"""() {
+								"""+test.code+"""
+    }
+"""
+				cpt++;
+			}
+		}
+
+		String junitStringCall = ""
+		int cpt2 = 0
+		if(snippet.exercice != null) {
+			for(test in snippet.exercice.tests) {
+				junitStringCall += """
+	test.test"""+cpt2+"""();
+		"""
+				cpt2++;
+			}
+		}
+
+		return """
+		package toto;
+		
+		import java.io.PrintStream;
+		
+		public class Test"""+snippet.id+""" {
+
+		public static PrintStream testOut;
+		public static PrintStream sysout;
+
+		public void check(boolean b, String okMessage, String koMessage) {
+			if(b) {
+				testOut.println("[SUCCESS]"+okMessage);
+			}
+			else {
+				testOut.println("[FAILURE]"+koMessage);
+			}
+		}
+
+			"""+snippet.code+"""
+			
+			"""+junitString+"""
+
+	public static void run(PrintStream testOut, PrintStream sysout) {
+		Test"""+snippet.id+""".testOut = testOut;
+				Test"""+snippet.id+""".sysout = sysout;
+
+		Test"""+snippet.id+""" test = new Test"""+snippet.id+"""();
+				"""+junitStringCall+"""
+		Test"""+snippet.id+""".testOut.close();
+				Test"""+snippet.id+""".sysout.close();
+	}
+		 
+}
+"""
+	}
+
 	public static class MyDiagnosticListener implements DiagnosticListener<JavaFileObject>
 	{
 		public void report(Diagnostic<? extends JavaFileObject> diagnostic)
@@ -62,18 +128,18 @@ class CompilationService {
 			return contents;
 		}
 	}
-	
+
 	class QuickLock {
-		
+
 		@WithWriteLock
 		public void waitForLock(){
-			
+
 		}
 	}
-	
+
 	def addLineToSnippetConsole(snippet, traceline, consoleline) {
-		if(snippet != null) {			
-			snippet.trace = traceline		
+		if(snippet != null) {
+			snippet.trace = traceline
 			snippet.console = consoleline
 			snippet.save(flush:true)
 		}
@@ -91,7 +157,7 @@ class CompilationService {
 		FileWriter writer = new FileWriter(sourceFile);
 
 		// redirect "manually" System.out to the sysout output stream
-		writer.write(snippet.getTestCode().replaceAll("System.out", "sysout"));
+		writer.write(getTestCode(snippet).replaceAll("System.out", "sysout"));
 		writer.close();
 
 		// for compilation diagnostic message processing on compilation WARNING/ERROR
@@ -150,12 +216,12 @@ class CompilationService {
 			PipedInputStream inp = new PipedInputStream();
 			PipedOutputStream outp = new PipedOutputStream(inp);
 			BufferedReader buffin = new BufferedReader(new InputStreamReader(inp));
-			
+
 			PipedInputStream sysinp = new PipedInputStream();
 			PipedOutputStream sysoutp = new PipedOutputStream(sysinp);
 			BufferedReader buffSysIn = new BufferedReader(new InputStreamReader(sysinp));
 
-			
+
 
 			snippet.trace = ""
 			snippet.console = ""
@@ -163,79 +229,71 @@ class CompilationService {
 			snippet.save(flush:true)
 
 			int finished = 0
-			
+
 			def sysLock = new QuickLock()
 			def testLock = new QuickLock()
-			
+
 			String testOutComplete = ""
 			String consoleOutComplete = ""
 			String testOutChanges = ""
 			String consoleOutChanges = ""
-			
-			
-			
+
+
+
 			def thtest = Thread.start {
 				String line = null;
-				
+
 				while((line = buffin.readLine()) != null) {
 					testOutChanges += line+"<br/>"
 					testOutComplete += line+"<br/>"
-					
-					sleep(30)
 				}
 				
-				finished++	
+				finished++
 				buffin.close()
-				//println("STOP TEST")
+				sleep(100)
+				finished++
 			}
-			
+
 			def thsys = Thread.start {
 				String line = null;
-				
+
 				while((line = buffSysIn.readLine()) != null) {
 					consoleOutChanges += line+"<br/>"
 					consoleOutComplete += line+"<br/>"
-					
-					sleep(30)
-				}				
+				}
 				
-				finished++				
+				finished++
 				buffSysIn.close()
-				
-				//println("STOP SYS")
+				sleep(100)
+				finished++
 			}
-			
+
 			def thSnippetUpdator = Thread.start {
-				
-				while(finished<2 || testOutChanges != "" || consoleOutChanges != "" && !executionFinished) {
+				while(!(finished==4)) {
 					sleep(50)
 					if(testOutChanges != "" || consoleOutChanges != "") {
-												
+
 						Snippet.withTransaction {
 							addLineToSnippetConsole(snippet, testOutComplete, consoleOutComplete)
 						}
-						
+
 						testOutChanges = ""
 						consoleOutChanges = ""
-						
-						sleep(100)
-					}
+					}					
 				}
-				
-				//println("STOP ENVOI")
 				
 				Snippet.withTransaction {
 					snippet.isRunning = false
 					snippet.save(flush:true)
 				}
 			}
-			
-			
-			def thExecution = Thread.start {				
+
+
+			def thExecution = Thread.start {
 				thisMethod.invoke(null, new PrintStream(outp), new PrintStream(sysoutp));
 				executionFinished = true
 			}
-			
+
 			System.out.println("Execution OK!")
 		}
 		else {

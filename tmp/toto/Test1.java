@@ -1,9 +1,9 @@
 
-package toto;
-
-import java.io.PrintStream;
-
-public class Test1 {
+		package toto;
+		
+		import java.io.PrintStream;
+		
+		public class Test1 {
 
 		public static PrintStream testOut;
 		public static PrintStream sysout;
@@ -17,40 +17,50 @@ public class Test1 {
 			}
 		}
 
-			class A {
-  private int nombre = 0;
+			class PGCD {
   
-  public void incremente() {
-  	// à implémenter!
-    nombre += 1;
-    sysout.println("message visible dans la console!");
-  }
-  
-  public int getNombre() {
-  	return nombre;
+  public int calcul(int a, int b) {
+    if(b>a) {
+      return calcul(b,a);
+    }
+    else if(a%b==0) {
+      return b;
+    }
+    else {
+      return calcul(a-b,b);
+    }
   }
 }
-	
-	
+			
+			
 
 	public void test0() {
-		A a = new A();
-a.incremente();
-check(a.getNombre()==1,"new A().inc() est egal à 1","new A().inc() n'est pas egal à 1");
+								PGCD pgcd = new PGCD();
+check(pgcd.calcul(10,20)==10,"le pgcd de 10 et 20 est bien 10!", "le pgcd de 10 et 20 doit être 10!");
+
+    }
+
+
+	public void test1() {
+								PGCD pgcd = new PGCD();
+check(pgcd.calcul(23,3)==1,"le pgcd de 23 et 3 est bien 1, car 23 est un nombre premier!",
+	  "le pgcd de 23 avec tout nombre doit être 1: 23 est un nombre premier!");
 
     }
 
 
 	public static void run(PrintStream testOut, PrintStream sysout) {
 		Test1.testOut = testOut;
-		Test1.sysout = sysout;
+				Test1.sysout = sysout;
 
 		Test1 test = new Test1();
-		
+				
 	test.test0();
-
+		
+	test.test1();
+		
 		Test1.testOut.close();
-		Test1.sysout.close();
+				Test1.sysout.close();
 	}
 		 
 }
